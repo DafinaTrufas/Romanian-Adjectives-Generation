@@ -1,3 +1,4 @@
+import pandas as pd
 from transitions import Machine
 
 
@@ -10,55 +11,16 @@ class RegularInflectionsFSM:
 
         self.machine = Machine(model=self, states=states, initial='q0')
 
-        self.machine.add_transition('generate_f_sg', 'q0', 'fsg', after='to_fsg')
         self.machine.add_transition('generate_m_pl', 'q0', 'mpl', after='to_mpl')
+        self.machine.add_transition('generate_f_sg', 'q0', 'fsg', after='to_fsg')
         self.machine.add_transition('generate_f_pl', 'q0', 'fpl', after='to_fpl')
 
     def to_fsg(self):
-        self.generated_forms.append(self.lemma + 'ă')
-
-    def to_mpl(self):
-        self.generated_forms.append(self.lemma + 'i')
-
-    def to_fpl(self):
-        self.generated_forms.append(self.lemma + 'e')
-
-    def generate_all_forms(self):
-        for trigger in ['generate_f_sg', 'generate_m_pl', 'generate_f_pl']:
-            getattr(self, trigger)()
-            self.state = 'q0'
-        for form in self.generated_forms:
-            print(form, end = ', ')
-        print()
-
-class EOConsonantInflectionsFSM(RegularInflectionsFSM):
-    def to_fsg(self):
-        self.generated_forms.append(self.lemma[:-2] + self.lemma[-2] + 'a' + self.lemma[-1] + 'ă')
-
-    def to_mpl(self):
-        if self.lemma[-1] == 's':
-            self.generated_forms.append(self.lemma[:-1] + 'și')
-        elif self.lemma[-1] == 'l':
-            self.generated_forms.append(self.lemma[:-1] + 'i')
+        if self.lemma[-2] == 'o' and self.lemma[-1] != 'r' or self.lemma[-2] == 'e' and self.lemma[-1] not in 'nrz':
+            self.generated_forms.append(self.lemma[:-1] + 'a' + self.lemma[-1] + 'ă')
         else:
-            self.generated_forms.append(self.lemma + 'i')
+            self.generated_forms.append(self.lemma + 'ă')
 
-    def to_fpl(self):
-        if self.lemma[-1] == 'g':
-            self.generated_forms.append(self.lemma[:-2] + self.lemma[-2] + self.lemma[-1] + 'i')
-        elif self.lemma[-2] == 'e':
-            self.generated_forms.append(self.lemma[:-2] + self.lemma[-2] + self.lemma[-1] + 'e')
-        else:
-            self.generated_forms.append(self.lemma[:-2] + self.lemma[-2] + 'a' + self.lemma[-1] + 'e')
-
-class TORInflectionsFSM(RegularInflectionsFSM):
-    def to_fsg(self):
-        self.generated_forms.append(self.lemma[:-2] + 'oare')
-
-    def to_fpl(self):
-        self.generated_forms.append(self.lemma[:-2] + 'oare')
-
-class DSTZInflectionsFSM(RegularInflectionsFSM):
     def to_mpl(self):
         if self.lemma[-1] == 'd':
             self.generated_forms.append(self.lemma[:-1] + 'zi')
@@ -69,27 +31,52 @@ class DSTZInflectionsFSM(RegularInflectionsFSM):
                 self.generated_forms.append(self.lemma[:-2] + 'ști')
             else:
                 self.generated_forms.append(self.lemma[:-1] + 'ți')
-        if self.lemma[-1] == 'z':
+        elif self.lemma[-1] == 'z':
             if self.lemma.endswith('eaz'):
                 self.generated_forms.append(self.lemma[:-2] + 'ji')
             else:
-                self.generated_forms.append(self.lemma[:-1] + 'ji')
+                self.generated_forms.append(self.lemma + 'i')
+        elif self.lemma[-3:] == 'ian':
+            self.generated_forms.append(self.lemma[:-2] + 'eni')
+        elif self.lemma[-3:] == 'ean':
+            self.generated_forms.append(self.lemma[:-2] + 'ni')
+        else:
+            self.generated_forms.append(self.lemma + 'i')
 
     def to_fpl(self):
-        if self.lemma.endswith('eaz'):
+        if self.lemma[-2] == 'o' and self.lemma[-1] != 'r':
+            self.generated_forms.append(self.lemma[:-1] + 'a' + self.lemma[-1] + 'e')
+        elif self.lemma.endswith('eaz'):
             self.generated_forms.append(self.lemma[:-2] + 'ze')
+        elif self.lemma[-3:] == 'ian':
+            self.generated_forms.append(self.lemma[:-2] + 'ene')
+        elif self.lemma[-3:] == 'ean':
+            self.generated_forms.append(self.lemma[:-2] + 'ne')
         else:
             self.generated_forms.append(self.lemma + 'e')
 
+    def generate_all_forms(self):
+        for trigger in ['generate_m_pl', 'generate_f_sg', 'generate_f_pl']:
+            getattr(self, trigger)()
+            self.state = 'q0'
+        return self.generated_forms
+
+class TORInflectionsFSM(RegularInflectionsFSM):
+    def to_fsg(self):
+        self.generated_forms.append(self.lemma[:-2] + 'oare')
+
+    def to_fpl(self):
+        self.generated_forms.append(self.lemma[:-2] + 'oare')
+
 class UVowelInfectionsFSM(RegularInflectionsFSM):
     def to_fsg(self):
-        if self.lemma == 'roșu':
+        if self.lemma.endswith('roșu'):
             self.generated_forms.append(self.lemma[:-1] + 'ie')
         else:
             self.generated_forms.append(self.lemma[:-1] + 'ă')
 
     def to_mpl(self):
-        if self.lemma == 'roșu':
+        if self.lemma.endswith('roșu'):
             self.generated_forms.append(self.lemma[:-1] + 'ii')
         elif self.lemma.endswith('stru'):
             self.generated_forms.append(self.lemma[:-4] + 'ștri')
@@ -97,7 +84,7 @@ class UVowelInfectionsFSM(RegularInflectionsFSM):
             self.generated_forms.append(self.lemma[:-1] + 'i')
 
     def to_fpl(self):
-        if self.lemma == 'roșu':
+        if self.lemma.endswith('roșu'):
             self.generated_forms.append(self.lemma[:-1] + 'ii')
         else:
             self.generated_forms.append(self.lemma[:-1] + 'e')
@@ -270,17 +257,12 @@ class InvariableFSM(RegularInflectionsFSM):
         self.generated_forms.append(self.lemma)
 
 def generate_inflections(lemma):
-    fsm = None
-    if lemma.endswith('tor'):
+    if lemma[-3:] in ['tor', 'șor']:
         fsm = TORInflectionsFSM(lemma)
-    elif lemma[-2] in 'eo' and lemma[-1] not in 'aeiu':
-        fsm = EOConsonantInflectionsFSM(lemma)
-    elif lemma[1] == 'â' and not lemma.endswith('esc'):
+    elif len(lemma) >= 2 and lemma[1] == 'â' and not lemma.endswith('esc'):
         fsm = ÂInflectionsFSM(lemma)
-    elif lemma[-1] not in 'aeioucgdstz':
+    elif lemma[-1] not in 'aeioucg':
         fsm = RegularInflectionsFSM(lemma)
-    elif lemma[-1] in 'dstz':
-        fsm = DSTZInflectionsFSM(lemma)
     elif lemma[-1] == 'u' and lemma[-2] not in 'aâăeiou':
         fsm = UVowelInfectionsFSM(lemma)
     elif lemma[-1] == 'u' and lemma[-2] in 'aăâeo':
@@ -303,11 +285,32 @@ def generate_inflections(lemma):
         fsm = CAffricatedVelarConsonantInflectionsFSM(lemma)
     else:
         fsm = InvariableFSM(lemma)
-    fsm.generate_all_forms()
+    return fsm.generate_all_forms()
 
-with open('romanian_adjectives.txt', 'r', encoding="utf-8") as f:
-    for adj in f.readlines():
-        if adj[-1] == '\n':
-            generate_inflections(adj[:-1])
-        else:
-            generate_inflections(adj)
+def test_on_dex():
+    df_adj_forme = pd.read_csv("adjective_forme.csv")
+
+    unique_adjectives = df_adj_forme["base_form"].unique().tolist()
+    num_adj = len(unique_adjectives)
+
+    good_adjectives = 0
+    corrupt = 0
+    for adj in unique_adjectives:
+        forms = generate_inflections(adj)
+        ok = 1
+        for form in forms:
+            if form not in df_adj_forme["inflection"].tolist():
+                corrupt += 1
+                ok = 0
+                print(forms)
+                break
+        if ok:
+            good_adjectives += 1
+
+    print(f"Good: {good_adjectives}")
+    print(f"Corrupt: {corrupt}")
+    print(f"Total: {num_adj}")
+
+    print(f"Covered: {good_adjectives / num_adj * 100:.2f}%")
+
+test_on_dex()
