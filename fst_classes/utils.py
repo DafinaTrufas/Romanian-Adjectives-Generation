@@ -2,7 +2,8 @@ import pynini as pn
 from abc import ABC, abstractmethod
 from functools import cache
 
-class InflectionalClass(ABC): 
+
+class InflectionalClass(ABC):
     @abstractmethod
     def make_word_fst(self) -> pn.Fst:
         """Generate the FST for the stem of the word
@@ -11,7 +12,7 @@ class InflectionalClass(ABC):
             pn.Fst: FST for the stem of the word
         """
         pass
-    
+
     @abstractmethod
     def to_msg(self) -> pn.Fst:
         """To masculine singular
@@ -20,7 +21,7 @@ class InflectionalClass(ABC):
             pn.Fst: FST for the masculine singular form
         """
         pass
-    
+
     @abstractmethod
     def to_fsg(self) -> pn.Fst:
         """To feminine singular
@@ -29,7 +30,7 @@ class InflectionalClass(ABC):
             pn.Fst: FST for the feminine singular form
         """
         pass
-    
+
     @abstractmethod
     def to_mpl(self) -> pn.Fst:
         """To masculine plural
@@ -38,7 +39,7 @@ class InflectionalClass(ABC):
             pn.Fst: FST for the masculine plural form
         """
         pass
-    
+
     @abstractmethod
     def to_fpl(self) -> pn.Fst:
         """To feminine plural
@@ -48,30 +49,34 @@ class InflectionalClass(ABC):
         """
         pass
 
+
 @cache
-def letters_mapping(lang: str = 'RO') -> pn.SymbolTable:
+def letters_mapping(lang: str = "RO") -> pn.SymbolTable:
     """Map all ASCII + Romanian letters to pynini Symbol Table.
     Cached function since it performs a lot of computations but the result is always the same for RO.
+
+    Reference: https://wellformedness.com/courses/LING83800/
 
     Returns:
         pn.SymbolTable: Symbol table with all ASCII + Romanian letters
     """
     letters_table = pn.SymbolTable()
     letters_table.add_symbol("<eps>", 0)
-    
+
     for i in range(97, 123):
         # Add ASCII lowercase letters
         letters_table.add_symbol(f"{chr(i)}", i)
-    
-    if lang == 'RO':
+
+    if lang == "RO":
         # Add Romanian letters
         letters_table.add_symbol("ă", 259)
         letters_table.add_symbol("â", 226)
         letters_table.add_symbol("î", 238)
         letters_table.add_symbol("ș", 537)
         letters_table.add_symbol("ț", 539)
-    
+
     return letters_table
+
 
 def dec_letter_mapping(func) -> callable:
     """Add input/output symbols to the InflectionalClass subclass inflection method sub returned by the decorated function. Can be used when concatenating FSTs
@@ -82,16 +87,19 @@ def dec_letter_mapping(func) -> callable:
     Returns:
         callable: Decorated function
     """
+
     def wrapper(*args, **kwargs) -> pn.Fst:
         ascii_table = letters_mapping()
         res = func(*args, **kwargs)
         res.set_input_symbols(ascii_table)
         res.set_output_symbols(ascii_table)
-        
+
         return res
+
     return wrapper
 
-def get_ro_fst(char) -> pn.Fst|str:
+
+def get_ro_fst(char) -> pn.Fst | str:
     """Hack in order to easily use Romanian letters in pynini by substituting them with an acceptor of the same letter with utf8 token type
 
     Args:
@@ -101,12 +109,6 @@ def get_ro_fst(char) -> pn.Fst|str:
         pn.Fst: Acceptor of the input letter with utf8 token type
     """
     try:
-        return {
-            'ă': pn.accep("ă", token_type="utf8"),
-            'â': pn.accep("â", token_type="utf8"),
-            'î': pn.accep("î", token_type="utf8"),
-            'ș': pn.accep("ș", token_type="utf8"),
-            'ț': pn.accep("ț", token_type="utf8"),   
-        }[char]
+        return pn.accep(char, token_type="utf8")
     except KeyError:
         return char
