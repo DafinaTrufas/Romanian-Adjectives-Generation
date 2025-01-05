@@ -125,23 +125,24 @@ class Adj3_2_eu_neologisms(InflectionalClass):
     """
 
     def __init__(self, stem: str) -> None:
-        raise NotImplementedError("This class is not implemented yet")
+        self.stem = stem
+        self.fst = self.make_word_fst()
 
     def make_word_fst(self):
-        pass
+        return pn.accep(self.stem[:-2], token_type="utf8").optimize()
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        pass
+        return (self.fst + pn.accep(self.stem[-2:], token_type="utf8")).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
-        pass
+        return (self.fst + pn.accep(get_ro_fst('ee'))).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        pass
+        return (self.fst + pn.accep(get_ro_fst('ei'))).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:
-        pass
+        return self.to_fsg()
