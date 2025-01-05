@@ -138,7 +138,10 @@ class IUInflectionsFSM(RegularInflectionsFSM):
 class VelarConsonantInflectionsFSM(RegularInflectionsFSM):
     def to_fsg(self):
         if self.lemma.endswith('esc'):
-            self.generated_forms.append(self.lemma[:-3] + 'ească')
+            if self.lemma[-4] == 'i':
+                self.generated_forms.append(self.lemma[:-3] + 'ască')
+            else:
+                self.generated_forms.append(self.lemma[:-3] + 'ească')
         else:
             self.generated_forms.append(self.lemma + 'ă')
 
