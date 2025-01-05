@@ -74,21 +74,22 @@ def letters_mapping(lang: str = "RO") -> pn.SymbolTable:
         letters_table.add_symbol("î", 238)
         letters_table.add_symbol("ș", 537)
         letters_table.add_symbol("ț", 539)
+        letters_table.add_symbol("-", 45)
 
     return letters_table
 
 
-def dec_letter_mapping(func) -> callable:
+def dec_letter_mapping(func: callable) -> callable:
     """Add input/output symbols to the InflectionalClass subclass inflection method sub returned by the decorated function. Can be used when concatenating FSTs
 
     Args:
-        func (_type_): InflectionalClass subclass inflection method
+        func (callable): InflectionalClass subclass inflection method
 
     Returns:
         callable: Decorated function
     """
 
-    def wrapper(*args, **kwargs) -> pn.Fst:
+    def wrapper(*args: list, **kwargs: dict) -> pn.Fst:
         ascii_table = letters_mapping()
         res = func(*args, **kwargs)
         res.set_input_symbols(ascii_table)
@@ -99,16 +100,16 @@ def dec_letter_mapping(func) -> callable:
     return wrapper
 
 
-def get_ro_fst(char) -> pn.Fst | str:
+def get_ro_fst(str_to_convert: str) -> pn.Fst | str:
     """Hack in order to easily use Romanian letters in pynini by substituting them with an acceptor of the same letter with utf8 token type
 
     Args:
-        char (_type_): Letter to be substituted with the corresponding utf8 acceptor
+        str_to_convert (str): Letter to be substituted with the corresponding utf8 acceptor
 
     Returns:
         pn.Fst: Acceptor of the input letter with utf8 token type
     """
     try:
-        return pn.accep(char, token_type="utf8")
+        return pn.accep(str_to_convert, token_type="utf8")
     except KeyError:
-        return char
+        return str_to_convert

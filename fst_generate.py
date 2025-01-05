@@ -3,7 +3,6 @@ https://wellformedness.com/courses/LING83800/
 """
 
 
-import pynini as pn
 import re
 
 from fst_classes.fst_adj_4_0 import Adj4_0_u, Adj4_0_u_sem, Adj4_0_consonant
@@ -78,10 +77,10 @@ class Adjective:
 
 if __name__ == "__main__":
     try:
-        # adj = Adjective("acru")
+        adj = Adjective("acru")
         # adj = Adjective("greu")
         # adj = Adjective("haiducesc")
-        adj = Adjective("cenușiu")
+        # adj = Adjective("cenușiu")
         # adj = Adjective("răbdător")
         # adj = Adjective("lălâu")
         # adj = Adjective("clănțău")
