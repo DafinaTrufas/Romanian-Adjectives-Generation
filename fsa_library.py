@@ -79,9 +79,12 @@ class ConsonantFSM(InflectionsFSM):
             self.state = 'q0'
         return self.generated_forms
 
-class TORInflectionsFSM(InflectionsFSM):
+class STZORInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
-        self.generated_forms.append(self.lemma[:-2] + 'oare')
+        if self.lemma == 'accesor':
+            self.generated_forms.append(self.lemma[:-2] + 'oară')
+        else:
+            self.generated_forms.append(self.lemma[:-2] + 'oare')
 
     def to_fpl(self):
         self.to_fsg()
@@ -278,10 +281,10 @@ class InvariableFSM(InflectionsFSM):
         self.to_fsg()
 
 def generate_inflections(lemma):
-    if lemma[-3:] == 'tor':
-        fsm = TORInflectionsFSM(lemma)
-    elif len(lemma) >= 2 and lemma[1] == 'â' and not lemma.endswith('esc'):
-        fsm = ÂInflectionsFSM(lemma)
+    if lemma[-3:] in ['sor', 'tor', 'zor']:
+        fsm = STZORInflectionsFSM(lemma)
+    # elif len(lemma) >= 2 and lemma[1] == 'â' and not lemma.endswith('esc'):
+    #     fsm = ÂInflectionsFSM(lemma)
     elif lemma[-1] not in 'aeioucg':
         fsm = ConsonantFSM(lemma)
     elif lemma[-1] == 'u' and lemma[-2] not in 'aâăeiou':
