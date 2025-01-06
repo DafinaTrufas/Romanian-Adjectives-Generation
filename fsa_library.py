@@ -290,13 +290,6 @@ class JuneInflectionsFSM(InflectionsFSM):
     def to_fpl(self):
         self.generated_forms.append(self.lemma)
 
-class ÂInflectionsFSM(InflectionsFSM):
-    def to_mpl(self):
-        self.generated_forms.append(self.lemma[:1] + 'i' + self.lemma[2] + 'e' + self.lemma[4:] + 'i')
-
-    def to_fpl(self):
-        self.generated_forms.append(self.lemma[:1] + 'i' + self.lemma[2] + 'e' + self.lemma[4:] + 'e')
-
 class IndeclinableFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma)
@@ -312,8 +305,6 @@ def generate_inflections(lemma):
         fsm = IndeclinableFSM(lemma)
     elif lemma[-3:] in ['sor', 'tor', 'zor']:
         fsm = STZORInflectionsFSM(lemma)
-    # elif len(lemma) >= 2 and lemma[1] == 'â' and not lemma.endswith('esc'):
-    #     fsm = ÂInflectionsFSM(lemma)
     elif lemma[-1] not in 'aeioucg':
         fsm = ConsonantFSM(lemma)
     elif lemma[-1] == 'u' and lemma[-2] not in 'aâăeiou':
