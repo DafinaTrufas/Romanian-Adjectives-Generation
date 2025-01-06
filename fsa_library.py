@@ -32,7 +32,7 @@ class InflectionsFSM():
 
 class ConsonantFSM(InflectionsFSM):
     def to_fsg(self):
-        if self.lemma[-2] == 'o' and self.lemma[-1] != 'r' or self.lemma[-2] == 'e' and self.lemma[-1] not in 'nrz':
+        if self.lemma[-2] == 'o' and self.lemma[-3:] not in ['dor', 'lor', 'for', 'vor', 'fob', 'top', 'rof', 'rop', 'pod', 'rob', 'don', 'dot', 'rom', 'tom', 'ton', 'fon', 'col', 'lof', 'lot', 'got', 'cor', 'rot', 'hor', 'xon', 'zon', 'gon', 'ron', 'nom', 'mon', 'por', 'nop', 'lop', 'mod'] and self.lemma[-2:] not in ['ot', 'ox'] or self.lemma in ['bleot', 'box', 'econom', 'fanfaron', 'idiot', 'netot'] or self.lemma[-2] == 'e' and self.lemma[-3:] not in ['bet', 'ped', 'lel', 'let', 'pet'] and self.lemma[-2:] not in ['eh', 'em', 'ex'] and self.lemma[-1] not in 'nrz':
             self.generated_forms.append(self.lemma[:-1] + 'a' + self.lemma[-1] + 'ă')
         else:
             super().to_fsg()
@@ -47,6 +47,8 @@ class ConsonantFSM(InflectionsFSM):
                 self.generated_forms.append(self.lemma[:-2] + 'ști')
             else:
                 self.generated_forms.append(self.lemma[:-1] + 'ți')
+        elif self.lemma[-1] == 'x':
+            self.generated_forms.append(self.lemma[:-1] + 'cși')
         elif self.lemma[-1] == 'z':
             if self.lemma.endswith('eaz'):
                 self.generated_forms.append(self.lemma[:-2] + 'ji')
@@ -60,7 +62,7 @@ class ConsonantFSM(InflectionsFSM):
             super().to_mpl()
 
     def to_fpl(self):
-        if self.lemma[-2] == 'o' and self.lemma[-1] != 'r':
+        if self.lemma[-2] == 'o' and self.lemma[-3:] not in ['dor', 'lor', 'for', 'vor', 'fob', 'top', 'rof', 'rop', 'pod', 'rob', 'don', 'dot', 'rom', 'tom', 'ton', 'fon', 'col', 'lof', 'lot', 'got', 'cor', 'rot', 'hor', 'xon', 'zon', 'gon', 'ron', 'nom', 'mon', 'por', 'nop', 'lop', 'mod'] and self.lemma[-2:] not in ['ot', 'ox'] or self.lemma in ['bleot', 'box', 'econom', 'fanfaron', 'idiot', 'netot']:
             self.generated_forms.append(self.lemma[:-1] + 'a' + self.lemma[-1] + 'e')
         elif self.lemma.endswith('eaz'):
             self.generated_forms.append(self.lemma[:-2] + 'ze')
@@ -77,7 +79,7 @@ class ConsonantFSM(InflectionsFSM):
             self.state = 'q0'
         return self.generated_forms
 
-class TȘORInflectionsFSM(InflectionsFSM):
+class TORInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma[:-2] + 'oare')
 
@@ -276,8 +278,8 @@ class InvariableFSM(InflectionsFSM):
         self.to_fsg()
 
 def generate_inflections(lemma):
-    if lemma[-3:] in ['tor', 'șor']:
-        fsm = TȘORInflectionsFSM(lemma)
+    if lemma[-3:] == 'tor':
+        fsm = TORInflectionsFSM(lemma)
     elif len(lemma) >= 2 and lemma[1] == 'â' and not lemma.endswith('esc'):
         fsm = ÂInflectionsFSM(lemma)
     elif lemma[-1] not in 'aeioucg':
