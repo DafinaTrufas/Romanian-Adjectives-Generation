@@ -1,6 +1,18 @@
 import pandas as pd
 from transitions import Machine
 
+indeclinable_adjectives = [
+    'acaju', 'acătărea', 'acătării', 'afro', 'aievea', 'alene', 'anevoie', 'anticorupție', 'anticriză', 'antidoping', 'antidumping', 'antifading', 'antiglonț', 'antigrindină', 'antiîmbătrânire', 'antimafia', 'antipersonal',
+    'antiporno', 'antirachetă', 'antistres', 'antisubmarin', 'antitetanos', 'antitrust', 'anume', 'asăminea', 'asemenea', 'atare', 'atroce', 'audio', 'audiovideo', 'bej', 'bengali', 'beton', 'bine', 'biv', 'blană', 'bleu',
+    'bordo', 'bun ca pâinea caldă', 'ca lumea', 'cașto', 'căcălău', 'călare', 'câtea', 'chit', 'cilibi', 'cogeamite', 'cogemite', 'color', 'cool', 'coșcogeme', 'coz', 'cringe', 'cu capul în nori', 'cumsecade', 'cușer',
+    'cutare', 'cvasi', 'de', 'de baltă', 'de teren', 'de treabă', 'dentăiu', 'dentâiu', 'deosebi', 'disco', 'ditai', 'ditamai', 'doldora', 'drive-in', 'dry', 'eficace', 'evghenichi', 'expre', 'farin', 'fărădelege', 'ferice',
+    'forte', 'fucking', 'fucsia', 'fugace', 'full-time', 'gaga', 'gata', 'gay', 'get-beget', 'gigea', 'gogeamite', 'gratis', 'grena', 'gri', 'hi-fi', 'high', 'hindustani', 'hippy', 'horror', 'ieftin ca braga', 'in-cuarto', 'in-cvarto',
+    'incognito', 'indigo', 'indoor', 'instant', 'intercluburi', 'iute ca săgeata', 'iuti', 'ivoar', 'izabel', 'în cauză', 'kaki', 'laiv', 'leoarcă', 'lestie', 'lila', 'liliput', 'live', 'maro', 'maxi', 'merinos',
+    'meteo', 'midi', 'mini', 'mișto', 'mov', 'multicanal', 'multimedia', 'multispot', 'muscat', 'nașpa', 'nepereche', 'niscai', 'niscaiva', 'non-stop', 'nonprofit', 'nonstop', 'numai piele și os', 'oareșicare', 'oliv',
+    'oranj', 'otova', 'pane', 'papua', 'pe dos', 'pe lângă', 'pendinte', 'pepita', 'plointe', 'pop', 'porno', 'princeps', 'profi', 'prost ca noaptea', 'punk', 'pursânge', 'quechua', 'retard',
+    'retro', 'roz', 'sadea', 'second-hand', 'sexy', 'shocking', 'soul', 'standby', 'stereo', 'super', 'șamoa', 'șucada', 'șuco', 'vâlvoi', 'vel', 'verde ca bradul', 'vernil', 'video', 'vivace'
+]
+
 
 class InflectionsFSM():
     def __init__(self, lemma):
@@ -32,25 +44,32 @@ class InflectionsFSM():
 
 class ConsonantFSM(InflectionsFSM):
     def to_fsg(self):
-        if self.lemma[-2] == 'o' and self.lemma[-3:] not in ['dor', 'lor', 'for', 'vor', 'fob', 'top', 'rof', 'rop', 'pod', 'rob', 'don', 'dot', 'rom', 'tom', 'ton', 'fon', 'col', 'lof', 'lot', 'got', 'cor', 'rot', 'hor', 'xon', 'zon', 'gon', 'ron', 'nom', 'mon', 'por', 'nop', 'lop', 'mod'] and self.lemma[-2:] not in ['ot', 'ox'] or self.lemma in ['bleot', 'box', 'econom', 'fanfaron', 'idiot', 'netot'] or self.lemma[-2] == 'e' and self.lemma[-3:] not in ['bet', 'ped', 'lel', 'let', 'pet'] and self.lemma[-2:] not in ['eh', 'em', 'ex'] and self.lemma[-1] not in 'nrz':
+        if self.lemma[-2] == 'o' and self.lemma[-3:] not in ['dor', 'lor', 'for', 'vor', 'fob', 'top', 'rof', 'rop', 'pod', 'rob', 'don', 'dot', 'rom', 'tom', 'ton', 'fon', 'col', 'lof', 'lot', 'got', 'cor', 'rot', 'hor', 'xon', 'zon', 'gon', 'ron', 'nom', 'mon', 'por', 'nop', 'lop', 'mod'] and self.lemma[-2:] not in ['ot', 'ox'] or self.lemma in ['bleot', 'box', 'econom', 'fanfaron', 'idiot', 'netot'] or self.lemma[-2] == 'e' and self.lemma[-3:] not in ['bet', 'fed', 'ped', 'lel', 'let', 'pet'] and self.lemma[-2:] not in ['eh', 'el', 'em', 'ex'] and self.lemma[-1] not in 'nrz':
             self.generated_forms.append(self.lemma[:-1] + 'a' + self.lemma[-1] + 'ă')
+        elif self.lemma[-2:] == 'el' and self.lemma[-3] not in 'fl':
+            self.generated_forms.append(self.lemma[:-1] + 'a')
         else:
             super().to_fsg()
 
     def to_mpl(self):
         if self.lemma[-1] == 'd':
-            self.generated_forms.append(self.lemma[:-1] + 'zi')
+            if self.lemma[-2:-1] == 'ea':
+                self.generated_forms.append(self.lemma[:-2] + 'zi')
+            else:
+                self.generated_forms.append(self.lemma[:-1] + 'zi')
         elif self.lemma[-1] == 's':
             self.generated_forms.append(self.lemma[:-1] + 'și')
         elif self.lemma[-1] == 't':
             if self.lemma[-2] == 's':
                 self.generated_forms.append(self.lemma[:-2] + 'ști')
+            elif self.lemma == 'beat':
+                self.generated_forms.append(self.lemma[:-2] + 'ți')
             else:
                 self.generated_forms.append(self.lemma[:-1] + 'ți')
         elif self.lemma[-1] == 'x':
             self.generated_forms.append(self.lemma[:-1] + 'cși')
         elif self.lemma[-1] == 'z':
-            if self.lemma.endswith('eaz'):
+            if self.lemma[-3:-1] == 'ea':
                 self.generated_forms.append(self.lemma[:-2] + 'ji')
             else:
                 self.generated_forms.append(self.lemma + 'i')
@@ -58,6 +77,10 @@ class ConsonantFSM(InflectionsFSM):
             self.generated_forms.append(self.lemma[:-2] + 'eni')
         elif self.lemma[-3:] == 'ean':
             self.generated_forms.append(self.lemma[:-2] + 'ni')
+        elif self.lemma[-2:] == 'el' and self.lemma[-3] not in 'fl':
+            self.generated_forms.append(self.lemma[:-1] + 'i')
+        elif self.lemma[-3:-1] == 'ea' and self.lemma[-1] not in 'lrtv':
+            self.generated_forms.append(self.lemma[:-2] + self.lemma[-1] + 'i')
         else:
             super().to_mpl()
 
@@ -70,6 +93,10 @@ class ConsonantFSM(InflectionsFSM):
             self.generated_forms.append(self.lemma[:-2] + 'ene')
         elif self.lemma[-3:] == 'ean':
             self.generated_forms.append(self.lemma[:-2] + 'ne')
+        elif self.lemma == 'beat':
+            self.generated_forms.append(self.lemma[:-2] + 'te')
+        elif self.lemma[-3:-1] == 'ea' and self.lemma[-1] not in 'lrtv':
+            self.generated_forms.append(self.lemma[:-2] + self.lemma[-1] + 'e')
         else:
             super().to_fpl()
 
@@ -270,7 +297,7 @@ class ÂInflectionsFSM(InflectionsFSM):
     def to_fpl(self):
         self.generated_forms.append(self.lemma[:1] + 'i' + self.lemma[2] + 'e' + self.lemma[4:] + 'e')
 
-class InvariableFSM(InflectionsFSM):
+class IndeclinableFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma)
 
@@ -281,7 +308,9 @@ class InvariableFSM(InflectionsFSM):
         self.to_fsg()
 
 def generate_inflections(lemma):
-    if lemma[-3:] in ['sor', 'tor', 'zor']:
+    if lemma in indeclinable_adjectives:
+        fsm = IndeclinableFSM(lemma)
+    elif lemma[-3:] in ['sor', 'tor', 'zor']:
         fsm = STZORInflectionsFSM(lemma)
     # elif len(lemma) >= 2 and lemma[1] == 'â' and not lemma.endswith('esc'):
     #     fsm = ÂInflectionsFSM(lemma)
@@ -308,7 +337,7 @@ def generate_inflections(lemma):
     elif lemma.endswith('ci'):
         fsm = CAffricatedVelarConsonantInflectionsFSM(lemma)
     else:
-        fsm = InvariableFSM(lemma)
+        fsm = IndeclinableFSM(lemma)
     return fsm.generate_all_forms()
 
 def test_on_dex():
