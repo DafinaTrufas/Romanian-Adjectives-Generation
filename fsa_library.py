@@ -2,7 +2,7 @@ import pandas as pd
 from transitions import Machine
 
 
-class RegularInflectionsFSM:
+class InflectionsFSM():
     def __init__(self, lemma):
         self.lemma = lemma
         self.generated_forms = [lemma]
@@ -16,10 +16,26 @@ class RegularInflectionsFSM:
         self.machine.add_transition('generate_f_pl', 'q0', 'fpl', after='to_fpl')
 
     def to_fsg(self):
+        self.generated_forms.append(self.lemma + 'ă')
+
+    def to_mpl(self):
+        self.generated_forms.append(self.lemma + 'i')
+
+    def to_fpl(self):
+        self.generated_forms.append(self.lemma + 'e')
+
+    def generate_all_forms(self):
+        for trigger in ['generate_m_pl', 'generate_f_sg', 'generate_f_pl']:
+            getattr(self, trigger)()
+            self.state = 'q0'
+        return self.generated_forms
+
+class ConsonantFSM(InflectionsFSM):
+    def to_fsg(self):
         if self.lemma[-2] == 'o' and self.lemma[-1] != 'r' or self.lemma[-2] == 'e' and self.lemma[-1] not in 'nrz':
             self.generated_forms.append(self.lemma[:-1] + 'a' + self.lemma[-1] + 'ă')
         else:
-            self.generated_forms.append(self.lemma + 'ă')
+            super().to_fsg()
 
     def to_mpl(self):
         if self.lemma[-1] == 'd':
@@ -41,7 +57,7 @@ class RegularInflectionsFSM:
         elif self.lemma[-3:] == 'ean':
             self.generated_forms.append(self.lemma[:-2] + 'ni')
         else:
-            self.generated_forms.append(self.lemma + 'i')
+            super().to_mpl()
 
     def to_fpl(self):
         if self.lemma[-2] == 'o' and self.lemma[-1] != 'r':
@@ -53,7 +69,7 @@ class RegularInflectionsFSM:
         elif self.lemma[-3:] == 'ean':
             self.generated_forms.append(self.lemma[:-2] + 'ne')
         else:
-            self.generated_forms.append(self.lemma + 'e')
+            super().to_fpl()
 
     def generate_all_forms(self):
         for trigger in ['generate_m_pl', 'generate_f_sg', 'generate_f_pl']:
@@ -61,14 +77,14 @@ class RegularInflectionsFSM:
             self.state = 'q0'
         return self.generated_forms
 
-class TORInflectionsFSM(RegularInflectionsFSM):
+class TȘORInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma[:-2] + 'oare')
 
     def to_fpl(self):
-        self.generated_forms.append(self.lemma[:-2] + 'oare')
+        self.to_fsg()
 
-class UVowelInfectionsFSM(RegularInflectionsFSM):
+class UVowelInfectionsFSM(InflectionsFSM):
     def to_fsg(self):
         if self.lemma.endswith('roșu'):
             self.generated_forms.append(self.lemma[:-1] + 'ie')
@@ -89,7 +105,7 @@ class UVowelInfectionsFSM(RegularInflectionsFSM):
         else:
             self.generated_forms.append(self.lemma[:-1] + 'e')
 
-class USemiVowelInfectionsFSM(RegularInflectionsFSM):
+class USemiVowelInfectionsFSM(InflectionsFSM):
     def to_fsg(self):
         if self.lemma == 'nou':
             self.generated_forms.append(self.lemma + 'ă')
@@ -125,7 +141,7 @@ class USemiVowelInfectionsFSM(RegularInflectionsFSM):
         else:
             self.generated_forms.append(self.lemma[:-1] + 'le')
 
-class IUInflectionsFSM(RegularInflectionsFSM):
+class IUInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma[:-1] + 'e')
 
@@ -133,9 +149,9 @@ class IUInflectionsFSM(RegularInflectionsFSM):
         self.generated_forms.append(self.lemma[:-1] + 'i')
 
     def to_fpl(self):
-        self.generated_forms.append(self.lemma[:-1] + 'i')
+        self.to_mpl()
 
-class VelarConsonantInflectionsFSM(RegularInflectionsFSM):
+class VelarConsonantInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         if self.lemma.endswith('esc'):
             if self.lemma[-4] == 'i':
@@ -143,7 +159,7 @@ class VelarConsonantInflectionsFSM(RegularInflectionsFSM):
             else:
                 self.generated_forms.append(self.lemma[:-3] + 'ească')
         else:
-            self.generated_forms.append(self.lemma + 'ă')
+            super().to_fsg()
 
     def to_mpl(self):
         if self.lemma.endswith('esc'):
@@ -151,7 +167,7 @@ class VelarConsonantInflectionsFSM(RegularInflectionsFSM):
         elif self.lemma.endswith('eag'):
             self.generated_forms.append(self.lemma[:-2] + 'gi')
         else:
-            self.generated_forms.append(self.lemma + 'i')
+            super().to_mpl()
 
     def to_fpl(self):
         if self.lemma.endswith('esc'):
@@ -163,7 +179,7 @@ class VelarConsonantInflectionsFSM(RegularInflectionsFSM):
         else:
             self.generated_forms.append(self.lemma + 'i')
 
-class EInflectionsFSM(RegularInflectionsFSM):
+class EInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma)
 
@@ -183,7 +199,7 @@ class EInflectionsFSM(RegularInflectionsFSM):
         else:
             self.generated_forms.append(self.lemma[:-1] + 'i')
 
-class UIInflectionsFSM(RegularInflectionsFSM):
+class UIInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma + 'e')
 
@@ -191,9 +207,9 @@ class UIInflectionsFSM(RegularInflectionsFSM):
         self.generated_forms.append(self.lemma)
 
     def to_fpl(self):
-        self.generated_forms.append(self.lemma)
+        self.to_mpl()
 
-class PalatalConsonantFSM(RegularInflectionsFSM):
+class PalatalConsonantFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma[:-1] + 'e')
 
@@ -202,11 +218,11 @@ class PalatalConsonantFSM(RegularInflectionsFSM):
 
     def to_fpl(self):
         if self.lemma == 'vechi':
-            self.generated_forms.append(self.lemma)
+            self.to_mpl()
         else:
             self.generated_forms.append(self.lemma[:-1] + 'e')
 
-class ISemiVowelInflectionsFSM(RegularInflectionsFSM):
+class ISemiVowelInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         if self.lemma.endswith('oi'):
             self.generated_forms.append(self.lemma[:-2] + 'oaie')
@@ -222,7 +238,7 @@ class ISemiVowelInflectionsFSM(RegularInflectionsFSM):
         else:
             self.generated_forms.append(self.lemma + 'e')
 
-class CAffricatedVelarConsonantInflectionsFSM(RegularInflectionsFSM):
+class CAffricatedVelarConsonantInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma[:-1] + 'e')
 
@@ -232,7 +248,7 @@ class CAffricatedVelarConsonantInflectionsFSM(RegularInflectionsFSM):
     def to_fpl(self):
         self.generated_forms.append(self.lemma[:-1] + 'e')
 
-class JuneInflectionsFSM(RegularInflectionsFSM):
+class JuneInflectionsFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma[:-1] + 'ă')
 
@@ -242,30 +258,30 @@ class JuneInflectionsFSM(RegularInflectionsFSM):
     def to_fpl(self):
         self.generated_forms.append(self.lemma)
 
-class ÂInflectionsFSM(RegularInflectionsFSM):
+class ÂInflectionsFSM(InflectionsFSM):
     def to_mpl(self):
         self.generated_forms.append(self.lemma[:1] + 'i' + self.lemma[2] + 'e' + self.lemma[4:] + 'i')
 
     def to_fpl(self):
         self.generated_forms.append(self.lemma[:1] + 'i' + self.lemma[2] + 'e' + self.lemma[4:] + 'e')
 
-class InvariableFSM(RegularInflectionsFSM):
+class InvariableFSM(InflectionsFSM):
     def to_fsg(self):
         self.generated_forms.append(self.lemma)
 
     def to_mpl(self):
-        self.generated_forms.append(self.lemma)
+        self.to_fsg()
 
     def to_fpl(self):
-        self.generated_forms.append(self.lemma)
+        self.to_fsg()
 
 def generate_inflections(lemma):
     if lemma[-3:] in ['tor', 'șor']:
-        fsm = TORInflectionsFSM(lemma)
+        fsm = TȘORInflectionsFSM(lemma)
     elif len(lemma) >= 2 and lemma[1] == 'â' and not lemma.endswith('esc'):
         fsm = ÂInflectionsFSM(lemma)
     elif lemma[-1] not in 'aeioucg':
-        fsm = RegularInflectionsFSM(lemma)
+        fsm = ConsonantFSM(lemma)
     elif lemma[-1] == 'u' and lemma[-2] not in 'aâăeiou':
         fsm = UVowelInfectionsFSM(lemma)
     elif lemma[-1] == 'u' and lemma[-2] in 'aăâeo':
