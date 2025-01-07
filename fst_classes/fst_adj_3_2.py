@@ -24,15 +24,15 @@ class Adj3_2_tor(InflectionalClass):
     def to_fsg(self) -> pn.Fst:
         return (
             self.fst
-            + pn.accep(self.stem[-3])
+            + pn.cross(self.stem[-3], self.stem[-3])
             + pn.cross(self.stem[-2], "oa")
-            + pn.accep(self.stem[-1])
-            + pn.accep("e")
+            + pn.cross(self.stem[-1], self.stem[-1])
+            + pn.cross("", "e")
         ).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-3:]) + pn.accep("i")).optimize()
+        return (self.fst + pn.accep(self.stem[-3:]) + pn.cross("", "i")).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:
@@ -61,9 +61,9 @@ class Adj3_2_âu(InflectionalClass):
     def to_fsg(self) -> pn.Fst:
         return (
             self.fst
-            + pn.accep(self.stem[-2], token_type="utf8")
+            + pn.cross(get_ro_fst(self.stem[-2]), get_ro_fst(self.stem[-2]))
             + pn.cross(self.stem[-1], "i")
-            + pn.accep("e")
+            + pn.cross("", "e")
         ).optimize()
 
     @dec_letter_mapping
@@ -137,11 +137,11 @@ class Adj3_2_eu_neologisms(InflectionalClass):
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
-        return (self.fst + pn.accep(get_ro_fst('ee'))).optimize()
+        return (self.fst + pn.accep(get_ro_fst("ee"))).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        return (self.fst + pn.accep(get_ro_fst('ei'))).optimize()
+        return (self.fst + pn.accep(get_ro_fst("ei"))).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:

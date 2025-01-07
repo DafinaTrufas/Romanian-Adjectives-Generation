@@ -20,6 +20,13 @@ from fst_classes.fst_adj_3_2 import (
     Adj3_2_ău,
 )
 
+from fst_classes.fst_adj_2_1 import Adj2_1_e
+from fst_classes.fst_adj_2_2 import Adj2_2_palatal_consonant, Adj2_2_ui
+from fst_classes.fst_adj_2_3 import Adj2_3_e_neologisms
+from fst_classes.fst_adj_2_4 import Adj2_4_i_semivowel, Adj2_4_ci
+
+from fst_classes.fst_adj_inv import Adj_Invariable
+
 
 class Adjective:
     """General class for handling adjective inflection
@@ -29,18 +36,33 @@ class Adjective:
     """
 
     terminations = {
-        "[^aeioâă]u$": (Adj4_0_u, "4 forme, -u"),
-        "[aeo]u$": (Adj4_0_u_sem, "4 forme, -u (semivocalic)"),  # ?
-        # "???$": (Adj4_0_consonant, "4 forme, -(consoana)"),
-        # "???$": (Adj4_0_consonant, "3 forme, -(consoana velara)"),
+        "(?!^roșu$)(^.*[^aeioâă]u$)": (Adj4_0_u, "4 forme, -u"),
+        "(?!^roșu$)(?!^nou$)(^.*[aeo]u$)": (Adj4_0_u_sem, "4 forme, -u (semivocalic)"),
+        "(?!^.*tor$)((^.*[aeiouăâ]c|g$)|(^.*[^aeiouăâîcg]$))": (
+            Adj4_0_consonant,
+            "4 forme, -(consoană)",
+        ),
+        "(?!^.*esc$)(^.*[c|g]$)": (
+            Adj3_1_velar_consonant,
+            "3 forme, -(consoană velară)",
+        ),
+        "(roșu|nou)$": (Adj3_1_others, "3 forme, roșu/nou"),
         "esc$": (Adj3_1_esc, "3 forme, tip 1, -esc"),
         "iu$": (Adj3_1_iu, "3 forme, tip 1, -iu"),
         "tor$": (Adj3_2_tor, "3 forme, tip 2, -tor"),
         "âu$": (Adj3_2_âu, "3 forme, tip 2, -âu"),
         "ău$": (Adj3_2_ău, "3 forme, tip 2, -âu"),
+        "^(?!.*che$).*e$": (Adj2_1_e, "3 forme, tip 1, -e"),
+        "(che|chi|ghe|ghi)$": (
+            Adj2_2_palatal_consonant,
+            "3 forme, tip 2, -(consoană palatală)",
+        ),
+        "ui$": (Adj2_2_ui, "2 forme, tip 2, -ui"),
+        "(ai|ei|oi)$": (Adj2_4_i_semivowel, "2 forme, tip 4, -i(semivocalic)"),
+        "ci$": (Adj2_4_ci, "2 forme, tip 4, -ci"),
     }
 
-    def __init__(self, stem: str) -> None:
+    def __init__(self, stem: str, invariable: bool = False) -> None:
         """Constructor for Adjective class
 
         Args:
@@ -48,6 +70,7 @@ class Adjective:
         """
         self.stem = stem
         self.generated_forms = []
+        self.invariable = invariable
 
         self.inflectional_class, self.rule_description = self.get_inflectional_class()
 
@@ -59,6 +82,9 @@ class Adjective:
         Returns:
             tuple: Inflectional class and rule description
         """
+        if self.invariable:
+            return (Adj_Invariable, "invariabil")
+
         for term in self.terminations:
             if re.search(term, self.stem):
                 return self.terminations[term]
@@ -77,13 +103,29 @@ class Adjective:
 
 if __name__ == "__main__":
     try:
-        adj = Adjective("acru")
+        # adj = Adjective("acru")
+        # adj = Adjective("alb")
         # adj = Adjective("greu")
         # adj = Adjective("haiducesc")
         # adj = Adjective("cenușiu")
         # adj = Adjective("răbdător")
         # adj = Adjective("lălâu")
         # adj = Adjective("clănțău")
+        # adj = Adjective("adânc")
+        # adj = Adjective("roșu")
+        # adj = Adjective("nou")
+        # adj = Adjective("dulce")
+        # adj = Adjective("vechi")
+        # adj = Adjective("gălbui")
+        # adj = Adjective("dibaci")
+        # adj = Adjective('bej', invariable=True)
+        # adj = Adjective('a-tot-văzător', invariable=False)
+        # adj = Adjective('aalenian', invariable=False)
+        # adj = Adjective('abalienat', invariable=False)
+        # adj = Adjective('abătut', invariable=False)
+        # adj = Adjective('abdus', invariable=False)
+        adj = Adjective("aburos", invariable=False)
+
         adj.generate_all_forms()
 
         print(adj.rule_description)

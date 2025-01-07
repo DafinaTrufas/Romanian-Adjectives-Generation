@@ -7,9 +7,10 @@ from fst_generate import Adjective
 import pynini as pn
 from pynini.lib.rewrite import matches as pn_matches
 import pandas as pd
+from tqdm.auto import tqdm
 
 # Load the adjectives
-df_adj_forme = pd.read_csv("adjective_forme.csv")
+df_adj_forme = pd.read_csv("adjectives_all.csv")
 
 # Get the unique adjectives
 unique_adjectives = df_adj_forme["base_form"].unique().tolist()
@@ -18,16 +19,18 @@ num_adj = len(unique_adjectives)
 # For each unique adjective, check its forms
 good_adjectives = 0
 corrupt = 0
-for adj in unique_adjectives:
+for adj in tqdm(unique_adjectives):
     try:
         adj = adj.strip()
 
-        # Generate forms
-        adj_obj = Adjective(adj)
-        adj_obj.generate_all_forms()
-
         # Get the gold forms
         gold_forms = df_adj_forme[df_adj_forme["base_form"] == adj]
+
+        is_invariable = gold_forms["POS"].iloc[0] == "Invariable"
+
+        # Generate forms
+        adj_obj = Adjective(adj, invariable=is_invariable)
+        adj_obj.generate_all_forms()
 
         # Compare
         assert pn_matches(

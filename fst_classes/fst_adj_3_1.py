@@ -25,8 +25,8 @@ class Adj3_1_esc(InflectionalClass):
         return (
             self.fst
             + pn.cross(self.stem[-3], "ea")
-            + pn.accep(self.stem[-2:])
-            + get_ro_fst("ă")
+            + pn.cross(self.stem[-2:], self.stem[-2:])
+            + pn.cross("", get_ro_fst("ă"))
         ).optimize()
 
     @dec_letter_mapping
@@ -93,17 +93,17 @@ class Adj3_1_others(InflectionalClass):
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
-        if self.stem == 'roșu':
-            return (self.fst + pn.accep('ie')).optimize()
-        elif self.stem == 'nou':
-            return (self.fst + pn.accep(self.stem[-1]) + pn.accep(get_ro_fst('ă'))).optimize()
+        if self.stem == "roșu":
+            return (self.fst + pn.cross(self.stem[-1], "ie")).optimize()
+        elif self.stem == "nou":
+            return (self.fst + pn.cross(self.stem[-1], get_ro_fst("uă"))).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        if self.stem == 'roșu':
-            return (self.fst + pn.accep(get_ro_fst('ii'))).optimize()
-        elif self.stem == 'nou':
-            return (self.fst + pn.accep(get_ro_fst('i'))).optimize()
+        if self.stem == "roșu":
+            return (self.fst + pn.cross(self.stem[-1], get_ro_fst("ii"))).optimize()
+        elif self.stem == "nou":
+            return (self.fst + pn.cross(self.stem[-1], get_ro_fst("i"))).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:
@@ -159,11 +159,11 @@ class Adj3_1_velar_consonant(InflectionalClass):
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
-        return (self.fst + pn.accep(get_ro_fst("ă"))).optimize()
+        return (self.fst + pn.cross("", get_ro_fst("ă"))).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        return (self.fst + pn.accep(get_ro_fst("i"))).optimize()
+        return (self.fst + pn.cross("", get_ro_fst("i"))).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:
