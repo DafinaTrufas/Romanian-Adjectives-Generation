@@ -1,18 +1,6 @@
 import pandas as pd
 from transitions import Machine
 
-indeclinable_adjectives = [
-    'acaju', 'acătărea', 'acătării', 'afro', 'aievea', 'alene', 'anevoie', 'anticorupție', 'anticriză', 'antidoping', 'antidumping', 'antifading', 'antiglonț', 'antigrindină', 'antiîmbătrânire', 'antimafia', 'antipersonal',
-    'antiporno', 'antirachetă', 'antistres', 'antisubmarin', 'antitetanos', 'antitrust', 'anume', 'asăminea', 'asemenea', 'atare', 'atroce', 'audio', 'audiovideo', 'bej', 'bengali', 'beton', 'bine', 'biv', 'blană', 'bleu',
-    'bordo', 'bun ca pâinea caldă', 'ca lumea', 'cașto', 'căcălău', 'călare', 'câtea', 'chit', 'cilibi', 'cogeamite', 'cogemite', 'color', 'cool', 'coșcogeme', 'coz', 'cringe', 'cu capul în nori', 'cumsecade', 'cușer',
-    'cutare', 'cvasi', 'de baltă', 'de teren', 'de treabă', 'dentăiu', 'dentâiu', 'deosebi', 'disco', 'ditai', 'ditamai', 'doldora', 'drive-in', 'dry', 'eficace', 'evghenichi', 'expre', 'farin', 'fărădelege', 'ferice',
-    'forte', 'fucking', 'fucsia', 'fugace', 'full-time', 'gaga', 'gata', 'gay', 'get-beget', 'gigea', 'gogeamite', 'gratis', 'grena', 'gri', 'hi-fi', 'high', 'hindustani', 'hippy', 'horror', 'ieftin ca braga', 'in-cuarto', 'in-cvarto',
-    'incognito', 'indigo', 'indoor', 'instant', 'intercluburi', 'iute ca săgeata', 'ivoar', 'izabel', 'în cauză', 'kaki', 'laiv', 'leoarcă', 'lestie', 'lila', 'liliput', 'live', 'maro', 'maxi', 'merinos',
-    'meteo', 'midi', 'mini', 'mișto', 'mov', 'multicanal', 'multimedia', 'multispot', 'muscat', 'nașpa', 'nepereche', 'niscai', 'niscaiva', 'non-stop', 'nonprofit', 'nonstop', 'numai piele și os', 'oareșicare', 'oliv',
-    'oranj', 'otova', 'pane', 'papua', 'pe dos', 'pe lângă', 'pendinte', 'pepita', 'plointe', 'pop', 'porno', 'princeps', 'profi', 'prost ca noaptea', 'punk', 'pursânge', 'quechua', 'retard',
-    'retro', 'roz', 'sadea', 'second-hand', 'sexy', 'shocking', 'soul', 'standby', 'stereo', 'super', 'șamoa', 'șucada', 'șuco', 'vâlvoi', 'vel', 'verde ca bradul', 'vernil', 'video', 'vivace'
-]
-
 
 class InflectionsFSM():
     def __init__(self, lemma):
@@ -301,7 +289,7 @@ class IndeclinableFSM(InflectionsFSM):
         self.to_fsg()
 
 def generate_inflections(lemma):
-    if lemma in indeclinable_adjectives:
+    if lemma in indeclinable_adj:
         fsm = IndeclinableFSM(lemma)
     elif lemma[-3:] in ['sor', 'tor', 'zor']:
         fsm = STZORInflectionsFSM(lemma)
@@ -331,15 +319,16 @@ def generate_inflections(lemma):
         fsm = IndeclinableFSM(lemma)
     return fsm.generate_all_forms()
 
+df_adj_forme = pd.read_csv("adjectives_all.csv")
+unique_adj = df_adj_forme["base_form"].unique().tolist()
+indeclinable_adj = df_adj_forme[df_adj_forme["POS"] == "Invariable"]["base_form"].unique().tolist()
+
 def test_on_dex():
-    df_adj_forme = pd.read_csv("adjective_forme.csv")
-
-    unique_adjectives = df_adj_forme["base_form"].unique().tolist()
-    num_adj = len(unique_adjectives)
-
     good_adjectives = 0
     corrupt = 0
-    for adj in unique_adjectives:
+    num_adj = len(unique_adj)
+
+    for adj in unique_adj:
         forms = generate_inflections(adj)
         ok = 1
         for form in forms:
