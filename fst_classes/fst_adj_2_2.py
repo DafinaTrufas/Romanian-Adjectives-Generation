@@ -18,11 +18,13 @@ class Adj2_2_palatal_consonant(InflectionalClass):
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-1])).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-1]), get_ro_fst(self.stem[-1]))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
-        return (self.fst + pn.cross(self.stem[-1], "e")).optimize()
+        return (self.fst + pn.cross(get_ro_fst(self.stem[-1]), "e")).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
@@ -49,11 +51,11 @@ class Adj2_2_ui(InflectionalClass):
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        return (self.fst + pn.cross(self.stem[-1], "i")).optimize()
+        return (self.fst + pn.cross(get_ro_fst(self.stem[-1]), "i")).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
-        return (self.fst + pn.cross(self.stem[-1], "ie")).optimize()
+        return (self.fst + pn.cross(get_ro_fst(self.stem[-1]), "ie")).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:

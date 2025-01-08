@@ -1,6 +1,6 @@
 import pynini as pn
 from abc import ABC, abstractmethod
-from functools import cache
+from functools import cache, lru_cache
 
 
 class InflectionalClass(ABC):
@@ -79,6 +79,7 @@ def letters_mapping(lang: str = "RO") -> pn.SymbolTable:
     return letters_table
 
 
+@lru_cache(maxsize=20)
 def dec_letter_mapping(func: callable) -> callable:
     """Add input/output symbols to the InflectionalClass subclass inflection method sub returned by the decorated function. Can be used when concatenating FSTs
 
@@ -100,6 +101,7 @@ def dec_letter_mapping(func: callable) -> callable:
     return wrapper
 
 
+@lru_cache(maxsize=20)
 def get_ro_fst(str_to_convert: str) -> pn.Fst | str:
     """Hack in order to easily use Romanian letters in pynini by substituting them with an acceptor of the same letter with utf8 token type
 

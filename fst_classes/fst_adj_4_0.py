@@ -65,7 +65,7 @@ class Adj4_0_u_sem(InflectionalClass):
 
 
 class Adj4_0_consonant(InflectionalClass):
-    """4 forms, -u (semivowel)
+    """4 forms, -(consonant)
 
     Args:
         InflectionalClass (_type_): Abstract class for inflectional classes

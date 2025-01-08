@@ -18,21 +18,27 @@ class Adj3_2_tor(InflectionalClass):
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-3:])).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-3:]), get_ro_fst(self.stem[-3:]))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
         return (
             self.fst
-            + pn.cross(self.stem[-3], self.stem[-3])
-            + pn.cross(self.stem[-2], "oa")
-            + pn.cross(self.stem[-1], self.stem[-1])
+            + pn.cross(get_ro_fst(self.stem[-3]), get_ro_fst(self.stem[-3]))
+            + pn.cross(get_ro_fst(self.stem[-2]), "oa")
+            + pn.cross(get_ro_fst(self.stem[-1]), get_ro_fst(self.stem[-1]))
             + pn.cross("", "e")
         ).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-3:]) + pn.cross("", "i")).optimize()
+        return (
+            self.fst
+            + pn.cross(get_ro_fst(self.stem[-3:]), get_ro_fst((self.stem[-3:])))
+            + pn.cross("", "i")
+        ).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:
@@ -55,14 +61,16 @@ class Adj3_2_âu(InflectionalClass):
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-2:], token_type="utf8")).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-2:]), get_ro_fst(self.stem[-2:]))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
         return (
             self.fst
             + pn.cross(get_ro_fst(self.stem[-2]), get_ro_fst(self.stem[-2]))
-            + pn.cross(self.stem[-1], "i")
+            + pn.cross(get_ro_fst(self.stem[-1]), "i")
             + pn.cross("", "e")
         ).optimize()
 
@@ -70,8 +78,8 @@ class Adj3_2_âu(InflectionalClass):
     def to_mpl(self) -> pn.Fst:
         return (
             self.fst
-            + pn.accep(self.stem[-2], token_type="utf8")
-            + pn.cross(self.stem[-1], "i")
+            + pn.cross(get_ro_fst(self.stem[-2]), get_ro_fst(self.stem[-2]))
+            + pn.cross(get_ro_fst(self.stem[-1]), "i")
         ).optimize()
 
     @dec_letter_mapping
@@ -95,22 +103,24 @@ class Adj3_2_ău(InflectionalClass):
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-2:], token_type="utf8")).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-2:]), get_ro_fst(self.stem[-2:]))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
         return (
             self.fst
             + pn.cross(get_ro_fst(self.stem[-2]), "a")
-            + pn.cross(self.stem[-1], "ie")
+            + pn.cross(get_ro_fst(self.stem[-1]), "ie")
         ).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
         return (
             self.fst
-            + pn.accep(self.stem[-2], token_type="utf8")
-            + pn.cross(self.stem[-1], "i")
+            + pn.cross(get_ro_fst(self.stem[-2]), get_ro_fst(self.stem[-2]))
+            + pn.cross(get_ro_fst(self.stem[-1]), "i")
         ).optimize()
 
     @dec_letter_mapping
@@ -133,15 +143,21 @@ class Adj3_2_eu_neologisms(InflectionalClass):
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-2:], token_type="utf8")).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-2:]), get_ro_fst(self.stem[-2:]))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
-        return (self.fst + pn.accep(get_ro_fst("ee"))).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-2]), get_ro_fst("ee"))
+        ).optimize()
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        return (self.fst + pn.accep(get_ro_fst("ei"))).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-2]), get_ro_fst("ei"))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:

@@ -18,7 +18,9 @@ class Adj2_1_e(InflectionalClass):
 
     @dec_letter_mapping
     def to_msg(self) -> pn.Fst:
-        return (self.fst + pn.accep(self.stem[-1])).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-1]), get_ro_fst(self.stem[-1]))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fsg(self) -> pn.Fst:
@@ -26,7 +28,9 @@ class Adj2_1_e(InflectionalClass):
 
     @dec_letter_mapping
     def to_mpl(self) -> pn.Fst:
-        return (self.fst + pn.cross(self.stem[-1], get_ro_fst("i"))).optimize()
+        return (
+            self.fst + pn.cross(get_ro_fst(self.stem[-1]), get_ro_fst("i"))
+        ).optimize()
 
     @dec_letter_mapping
     def to_fpl(self) -> pn.Fst:

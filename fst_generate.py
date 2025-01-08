@@ -46,16 +46,16 @@ class Adjective:
             Adj3_1_velar_consonant,
             "3 forme, -(consoană velară)",
         ),
-        "(roșu|nou)$": (Adj3_1_others, "3 forme, roșu/nou"),
+        "(roșu|nou|june)$": (Adj3_1_others, "3 forme, roșu/nou"),
         "esc$": (Adj3_1_esc, "3 forme, tip 1, -esc"),
         "iu$": (Adj3_1_iu, "3 forme, tip 1, -iu"),
         "tor$": (Adj3_2_tor, "3 forme, tip 2, -tor"),
         "âu$": (Adj3_2_âu, "3 forme, tip 2, -âu"),
         "ău$": (Adj3_2_ău, "3 forme, tip 2, -âu"),
-        "^(?!.*che$).*e$": (Adj2_1_e, "3 forme, tip 1, -e"),
+        "^(?!.*che$).*e$": (Adj2_1_e, "2 forme, tip 1, -e"),
         "(che|chi|ghe|ghi)$": (
             Adj2_2_palatal_consonant,
-            "3 forme, tip 2, -(consoană palatală)",
+            "2 forme, tip 2, -(consoană palatală)",
         ),
         "ui$": (Adj2_2_ui, "2 forme, tip 2, -ui"),
         "(ai|ei|oi)$": (Adj2_4_i_semivowel, "2 forme, tip 4, -i(semivocalic)"),
@@ -124,7 +124,11 @@ if __name__ == "__main__":
         # adj = Adjective('abalienat', invariable=False)
         # adj = Adjective('abătut', invariable=False)
         # adj = Adjective('abdus', invariable=False)
-        adj = Adjective("aburos", invariable=False)
+        # adj = Adjective("aburos", invariable=False)
+        # adj = Adjective("june", invariable=False)
+        # adj = Adjective("absolutoriu", invariable=False)
+        # adj = Adjective("călâi", invariable=False)
+        adj = Adjective("spânău", invariable=False)
 
         adj.generate_all_forms()
 

@@ -87,8 +87,13 @@ for adj in tqdm(unique_adjectives):
 
         good_adjectives += 1
     except Exception as e:
-        if type(e) == pn.lib.rewrite.Error:
+        if (
+            type(e) not in [AssertionError, IndexError]
+            and str(e).find("does not match any inflectional class") == -1
+        ):
             corrupt += 1
+        elif type(e) == IndexError:  # Some dictionary adjectives don't have all forms
+            good_adjectives += 1
 
 
 print(f"Good: {good_adjectives}")
